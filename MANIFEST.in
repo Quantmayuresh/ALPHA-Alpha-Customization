@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include alpha_customization *.css
+recursive-include alpha_customization *.csv
+recursive-include alpha_customization *.html
+recursive-include alpha_customization *.ico
+recursive-include alpha_customization *.js
+recursive-include alpha_customization *.json
+recursive-include alpha_customization *.md
+recursive-include alpha_customization *.png
+recursive-include alpha_customization *.py
+recursive-include alpha_customization *.svg
+recursive-include alpha_customization *.txt
+recursive-exclude alpha_customization *.pyc
