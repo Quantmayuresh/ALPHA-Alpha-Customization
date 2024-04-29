@@ -199,3 +199,13 @@ app_license = "MIT"
 # auth_hooks = [
 #	"alpha_customization.auth.validate"
 # ]
+
+fixtures = [
+    {
+        "doctype": "Client Script",
+        "filters": [["name", "in", ('Bank Clearance Client Script' ,'Blanket Order Address' ,'Checked Rounded Total Delivery Note' ,'Checked rounded total Sales Invoice')],],
+
+    },
+
+]
+

@@ -1,0 +1,46 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Blanket Order",
+  "enabled": 1,
+  "modified": "2024-04-23 11:43:15.650296",
+  "module": "Alpha Customization",
+  "name": "Blanket Order Address",
+  "script": "frappe.ui.form.on('Blanket Order', {\n    custom_party_address: function(frm) {\n        if (frm.doc.custom_party_address) {\n            frappe.call({\n                method: \"alpha_customization.alpha_customization.blanket_order_address.get_display_address_for_blanket_order\",\n                args: {\n                    address_id: frm.doc.custom_party_address\n                },\n                callback: function(r) {\n                    if (r.message) {\n\n                        frm.doc.custom_party_address_display = r.message; // Assign m to custom_party_address_display field\n                        frm.refresh_field('custom_party_address_display'); // Refresh the field to update its value on the form\n                    }\n                }\n            });\n        }\n    },\n});\n\n\n\nfunction method_call_method(frm, party, party_type) {\n    frappe.call({\n        method: \"alpha_customization.alpha_customization.blanket_order_address.get_address_for_blanket_order\",\n        args: {\n            party: party,\n            party_type: party_type\n\n        },\n        callback: function(r) {\n            if (r.message) {\n                var k = r.message[0];\n                var m = r.message[1];\n\n                frm.doc.custom_party_address = k; // Assign k to custom_party_address field\n                frm.doc.custom_party_address_display = r.message[1]; // Assign m to custom_party_address_display field\n                frm.refresh_field('custom_party_address'); // Refresh the field to update its value on the form\n                frm.refresh_field('custom_party_address_display'); // Refresh the field to update its value on the form\n\n\n            }\n        }\n    });\n}\n\n\nfrappe.ui.form.on('Blanket Order', {\n    supplier: function(frm) {\n        if (frm.doc.supplier) {\n\n            frm.set_query(\"custom_party_address\", function() { // Replace with the name of the link field\n                return {\n                    filters: [\n                        [\"Dynamic Link\", \"link_doctype\", \"=\", 'Supplier'],\n                        [\"Dynamic Link\", \"link_name\", \"=\", frm.doc.supplier],\n                    ]\n                };\n            });\n            method_call_method(frm, frm.doc.supplier, 'Supplier');\n        }\n    },\n});\n\nfrappe.ui.form.on('Blanket Order', {\n    customer: function(frm) {\n        if (frm.doc.customer) {\n            frm.set_query(\"custom_party_address\", function() { // Replace with the name of the link field\n                return {\n                    filters: [\n                        [\"Dynamic Link\", \"link_doctype\", \"=\", 'Customer'],\n                        [\"Dynamic Link\", \"link_name\", \"=\", frm.doc.customer],\n                    ]\n                };\n            });\n            method_call_method(frm, frm.doc.customer, 'Customer');\n        }\n    },\n});\n\n\n\nfrappe.ui.form.on('Blanket Order Item', {\n    item_code: function(frm, cdt, cdn) {\n        var child = locals[cdt][cdn];\n        var parent = frm.doc;\n        if (child.item_code) {\n            frappe.call({\n                method: \"alpha_customization.alpha_customization.blanket_order_address.ItemWeight\",\n                args: {\n                    item_code: child.item_code\n                },\n                callback: function(r) {\n\n                    var weight = r.message;\n                    child.custom_weight = weight;\n\n                }\n            });\n        }\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Bank Clearance",
+  "enabled": 1,
+  "modified": "2024-04-24 14:51:18.335852",
+  "module": "Accounts",
+  "name": "Bank Clearance Client Script",
+  "script": "frappe.ui.form.on('Bank Clearance', {\n    get_payment_entries: function(frm, cdt, cdn) {\n\n        frm.doc.payment_entries.forEach(function(item) {\n\n            frappe.call({\n                method: \"alpha_customization.alpha_customization.blanket_order_address.get_name_of_party\",\n                args: {\n                    party: item.against_account,\n\n                },\n                callback: function(r) {\n                    if (r.message) {\n                        var k = r.message;\n                        item.custom_against_account_name = k;\n                        item.refresh_field('custom_against_account_name');\n                        frm.refresh_field('payment_entries');\n\n                    }\n                }\n\n            });\n\n        });\n        frm.refresh_field('payment_entries');\n\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2024-04-29 20:08:48.243378",
+  "module": "Alpha Customization",
+  "name": "Checked Rounded Total Delivery Note",
+  "script": "frappe.ui.form.on('Delivery Note', {\n\trefresh(frm) {\n\t\t// your code here\n\t}\n})\n\nfrappe.ui.form.on('Delivery Note', {\n    refresh: function(frm) {\n    \t\t// Set the default value of my_checkbox_field to 1 (checked)\n    \t\tfrm.set_value('disable_rounded_total', 1);\n    \t}\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2024-04-29 20:09:06.393155",
+  "module": "Alpha Customization",
+  "name": "Checked rounded total Sales Invoice",
+  "script": "frappe.ui.form.on('Sales Invoice', {\n\trefresh(frm) {\n\t\t// your code here\n\t}\n})\n\nfrappe.ui.form.on('Sales Invoice', {\n    refresh: function(frm) {\n    \t\t// Set the default value of my_checkbox_field to 1 (checked)\n    \t\tfrm.set_value('disable_rounded_total', 1);\n    \t}\n})",
+  "view": "Form"
+ }
+]
