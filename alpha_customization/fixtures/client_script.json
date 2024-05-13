@@ -2,6 +2,28 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Delivery Note",
+  "enabled": 1,
+  "modified": "2024-04-14 12:24:40.817789",
+  "module": null,
+  "name": "By default checked rounded total",
+  "script": "frappe.ui.form.on('Delivery Note', {\n\trefresh(frm) {\n\t\t// your code here\n\t}\n})\n\nfrappe.ui.form.on('Delivery Note', {\n\trefresh: function(frm) {\n\t\t// Set the default value of my_checkbox_field to 1 (checked)\n\t\tfrm.set_value('disable_rounded_total', 1);\n\t}\n});\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2024-04-14 12:36:57.528250",
+  "module": null,
+  "name": "By default checked rounded total Sales Invoice",
+  "script": "frappe.ui.form.on('Sales Invoice', {\n    refresh: function(frm) {\n    \t\t// Set the default value of my_checkbox_field to 1 (checked)\n    \t\tfrm.set_value('disable_rounded_total', 1);\n    \t}\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Blanket Order",
   "enabled": 1,
   "modified": "2024-04-23 11:43:15.650296",
@@ -41,6 +63,105 @@
   "module": "Alpha Customization",
   "name": "Checked rounded total Sales Invoice",
   "script": "frappe.ui.form.on('Sales Invoice', {\n\trefresh(frm) {\n\t\t// your code here\n\t}\n})\n\nfrappe.ui.form.on('Sales Invoice', {\n    refresh: function(frm) {\n    \t\t// Set the default value of my_checkbox_field to 1 (checked)\n    \t\tfrm.set_value('disable_rounded_total', 1);\n    \t}\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2024-05-08 16:08:17.716099",
+  "module": null,
+  "name": "Get Returned Items",
+  "script": "frappe.ui.form.on('Sales Invoice', {\n    custom_get_data: function(frm ,cdt, cdn) {\n\n        var child = locals[cdt][cdn];\n\n        frm.call({\n            method: \"ms_production.ms_production.get_data.get_docs\",\n            args: {\n                f_date: frm.doc.custom_from_date,\n                t_date: frm.doc.custom_to_date,\n                company: frm.doc.company,\n                customer:frm.doc.customer_name\n\n            },\n            callback: function(response) {\n                \n                \n                if (!response.exc) {\n                    console.log(response.message)\n                    // Appending data to returned items child table\n                    frappe.model.clear_table(frm.doc, \"custom_returned_items\");\n                if(response.message[0].return_items){    \n                response.message[0].return_items.forEach(item=>{\n                    let row = frappe.model.add_child(frm.doc, \"Returned Items\", \"custom_returned_items\"); \n                    row.item_doc_name = item.item_doc_name,\n                    row.item_code = item.item_code,\n                    row.item_name = item.item_name,\n                    row.challan_reference = item.challan_reference,\n                    row.returnable_quantity = item.returnable_quantity,\n                    row.as_it_is = item.as_it_is,\n                    row.cr_rejection = item.cr_rejection,\n                    row.mr_rejection = item.mr_rejection,\n                    row.other_rejection = item.other_rejection,\n                    row.return_quantity = item.return_quantity,\n                    row.total_quantity = item.total_quantity,\n                    row.source_warehouse = item.source_warehouse,\n                    row.available_quantity = item.available_quantity,\n                    row.reference_id = item.reference_id,\n                    row.delivery_note = item.delivery_note,\n                    row.name1 = item.name1\n\n\n                })\n\n \n                  // Adding data to returned order summary child table\n                  frappe.model.clear_table(frm.doc, \"custom_returned_item_summary\");\n                  \n                  response.message[1].forEach(item=>{\n                         let row = frappe.model.add_child(frm.doc, \"Returned Item Summary\", \"custom_returned_item_summary\"); \n                         row.challan_reference = item.challan_reference,\n                         row.item_name = item.item_name,\n                         row.item_code = item.item_code,\n                         row.returnable_quantity = item.returnable_quantity,\n                         row.as_it_is = item.as_it_is,\n                         row.cr_rejection = item.cr_rejection,\n                         row.mr_rejection = item.mr_rejection,\n                         row.other_rejection = item.other_rejection,\n                         row.source_warehouse = item.source_warehouse,\n                         row.return_quantity = item.return_quantity,\n                         row.total_quantity = item.total_quantity,\n                         row.available_quantity = item.available_quantity,\n                         row.rate=item.rate;\n\n                    \n                        });\n                        \n                     //   Appending rows in details section item child table\n                    \n                        frappe.model.clear_table(frm.doc, \"items\");\n                        response.message[1].forEach(item=>{\n                         let row1 = frappe.model.add_child(frm.doc, \"Sales Invoice Item\", \"items\"); \n                         row1.item_code = response.message[2].labour_invoice_item__code;\n                         row1.item_name = response.message[2].labour_invoice_item__name;\n                         row1.uom = response.message[2].labour_invoice_item_uom;\n                         row1.description = response.message[3];\n                         row1.income_account = response.message[4];\n                         row1.qty = item.return_quantity;\n                         row1.rate = item.rate;\n                         frm.trigger('items');\n                        \n                        // frm.doc.items.push({\n                        // 'item_code': item.item_code,\n                        // 'qty': item.return_quantity,\n                        // 'rate': item.rate\n                        //  });\n\n                        })\n                \n                  frm.refresh();\n                }else{\n                    frappe.msgprint(\"client: No Data Found\");\n                }\n\n                }else {\n                    frappe.msgprint(\"Error: \" + response.exc);\n                }\n            }\n        });\n\n        frm.refresh_field(\"items\");\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Order",
+  "enabled": 1,
+  "modified": "2024-05-02 15:22:08.816215",
+  "module": null,
+  "name": "Sales Order Weight Display",
+  "script": "function method_call_method(frm, cdt, cdn) {\n    var child = locals[cdt][cdn];\n    var parent = frm.doc;\n    if (child.item_code && child.qty) {\n        frappe.call({\n            method: \"alpha_customization.alpha_customization.blanket_order_address.ItemWeight\",\n            args: {\n                item_code: child.item_code\n            },\n            callback: function(r) {\n                var weight = r.message;\n                var qty = child.qty;\n                child.custom_weight = weight * qty;\n            }\n        });\n    }\n}\n\n\nfrappe.ui.form.on('Sales Order Item', {\n    item_code: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    },\n\n    qty: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Delivery Note",
+  "enabled": 1,
+  "modified": "2024-05-02 15:43:49.002393",
+  "module": null,
+  "name": "Delivery Note Weight Display",
+  "script": "function method_call_method(frm, cdt, cdn) {\n    var child = locals[cdt][cdn];\n    var parent = frm.doc;\n    if (child.item_code && child.qty) {\n        frappe.call({\n            method: \"alpha_customization.alpha_customization.blanket_order_address.ItemWeight\",\n            args: {\n                item_code: child.item_code\n            },\n            callback: function(r) {\n                var weight = r.message;\n                var qty = child.qty;\n                child.custom_weight = weight * qty;\n            }\n        });\n    }\n}\n\n\nfrappe.ui.form.on('Delivery Note Item', {\n    item_code: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    },\n\n    qty: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2024-05-02 15:44:11.756281",
+  "module": null,
+  "name": "Sales Invoice Weight Display",
+  "script": "function method_call_method(frm, cdt, cdn) {\n    var child = locals[cdt][cdn];\n    var parent = frm.doc;\n    if (child.item_code && child.qty) {\n        frappe.call({\n            method: \"alpha_customization.alpha_customization.blanket_order_address.ItemWeight\",\n            args: {\n                item_code: child.item_code\n            },\n            callback: function(r) {\n                var weight = r.message;\n                var qty = child.qty;\n                child.custom_weight = weight * qty;\n            }\n        });\n    }\n}\n\n\nfrappe.ui.form.on('Sales Invoice Item', {\n    item_code: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    },\n\n    qty: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Order",
+  "enabled": 1,
+  "modified": "2024-05-02 15:44:16.282298",
+  "module": null,
+  "name": "Purchase Order Weight Display",
+  "script": "function method_call_method(frm, cdt, cdn) {\n    var child = locals[cdt][cdn];\n    var parent = frm.doc;\n    if (child.item_code && child.qty) {\n        frappe.call({\n            method: \"alpha_customization.alpha_customization.blanket_order_address.ItemWeight\",\n            args: {\n                item_code: child.item_code\n            },\n            callback: function(r) {\n                var weight = r.message;\n                var qty = child.qty;\n                child.custom_weight = weight * qty;\n            }\n        });\n    }\n}\n\n\nfrappe.ui.form.on('Purchase Order Item', {\n    item_code: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    },\n\n    qty: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Receipt",
+  "enabled": 1,
+  "modified": "2024-05-02 15:44:22.097331",
+  "module": null,
+  "name": "Purchase Receipt Weight Display",
+  "script": "function method_call_method(frm, cdt, cdn) {\n    var child = locals[cdt][cdn];\n    var parent = frm.doc;\n    if (child.item_code && child.qty) {\n        frappe.call({\n            method: \"alpha_customization.alpha_customization.blanket_order_address.ItemWeight\",\n            args: {\n                item_code: child.item_code\n            },\n            callback: function(r) {\n                var weight = r.message;\n                var qty = child.qty;\n                child.custom_weight = weight * qty;\n            }\n        });\n    }\n}\n\n\nfrappe.ui.form.on('Purchase Receipt Item', {\n    item_code: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    },\n\n    qty: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Invoice",
+  "enabled": 1,
+  "modified": "2024-05-02 15:44:28.747716",
+  "module": null,
+  "name": "Purchase Invoice Weight Display",
+  "script": "function method_call_method(frm, cdt, cdn) {\n    var child = locals[cdt][cdn];\n    var parent = frm.doc;\n    if (child.item_code && child.qty) {\n        frappe.call({\n            method: \"alpha_customization.alpha_customization.blanket_order_address.ItemWeight\",\n            args: {\n                item_code: child.item_code\n            },\n            callback: function(r) {\n                var weight = r.message;\n                var qty = child.qty;\n                child.custom_weight = weight * qty;\n            }\n        });\n    }\n}\n\n\nfrappe.ui.form.on('Purchase Invoice Item', {\n    item_code: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    },\n\n    qty: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Core Rejection Analysis",
+  "enabled": 1,
+  "modified": "2024-05-13 17:57:22.359570",
+  "module": "Quantbit Manufacturing",
+  "name": "Filter - Core Rejection Analysis",
+  "script": "var company_field = 'custom_company';\n\nfrappe.ui.form.on('Core Rejection Analysis', {\n    setup: function(frm) {\n        frm.set_query(\"core_item_code\", \"core_rejection_details\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Item\", company_field, '=', frm.doc.company], \n    \t               // ['Item', 'custom_is_finished_foundry_casting_items', '=',1],\n    \t                 [\"Item\", 'item_group', 'in', ['Cold Box','COLD BOX - PFPL','SHELL CORE','SHELL - PFPL']]\n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"core_warehouse\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"supervisor_id\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Employee\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"operator_id\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Employee\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"core_warehouse\", \"core_rejection_details\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"core_rejection_reason\", \"core_rejection_details\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Core Rejection Reason Master\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    }\n});\n\n\n\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Foundry Rejection Analaysis",
+  "enabled": 1,
+  "modified": "2024-05-13 17:58:02.991958",
+  "module": "Quantbit Foundry ERP",
+  "name": "Filter - Foundry Rejection Analysis",
+  "script": "var company_field = 'custom_company';\n\nfrappe.ui.form.on('Foundry Rejection Analaysis', {\n    setup: function(frm) {\n    //     frm.set_query(\"core_item_code\", \"core_rejection_details\", function(doc, cdt, cdn) { \n    // \tlet d = locals[cdt][cdn]; \n    // \treturn { \n    // \t    filters: [ \n    // \t                [\"Item\", company_field, '=', frm.doc.company], \n    // \t               // ['Item', 'custom_is_finished_foundry_casting_items', '=',1],\n    // \t                 [\"Item\", 'item_group', 'in', ['Cold Box','COLD BOX - PFPL','SHELL CORE','SHELL - PFPL']]\n    // \t           ] \n    // \t  \t};\n    // \t});\n    \t\n    \tfrm.set_query(\"source_warehouse\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"target_warehouse\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"supervisor_id\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Employee\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"operator_id\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Employee\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"target_warehouse\", \"rejection_details\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    }\n});\n\n\n\n",
   "view": "Form"
  }
 ]
