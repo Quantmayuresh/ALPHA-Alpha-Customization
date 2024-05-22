@@ -218,7 +218,7 @@ fixtures = [
                  'Purchase Invoice Weight Display',
                  'Purchase Order Weight Display',
                  'Purchase Receipt Weight Display',
-                 'Sales Invoice Weight Display', 'Sales Order Weight Display')
+                 'Sales Invoice Weight Display', 'Sales Order Weight Display' ,'eWaj Json' , 'eWay Bill')
             ],
         ],
     },
