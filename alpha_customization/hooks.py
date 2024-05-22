@@ -237,4 +237,15 @@ fixtures = [
             ],
         ],
     },
+
+    {
+        "doctype":
+        "Stock Entry Type",
+        "filters": [
+            [
+                "name", "in",
+                ('Purchase Material Return')
+            ],
+        ],
+    },
 ]

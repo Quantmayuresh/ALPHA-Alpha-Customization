@@ -1,0 +1,10 @@
+[
+ {
+  "add_to_transit": 0,
+  "docstatus": 0,
+  "doctype": "Stock Entry Type",
+  "modified": "2024-05-15 19:01:46.282984",
+  "name": "Purchase Material Return",
+  "purpose": "Material Issue"
+ }
+]
