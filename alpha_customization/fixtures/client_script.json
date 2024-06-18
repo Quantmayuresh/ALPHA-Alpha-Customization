@@ -136,7 +136,7 @@
   "doctype": "Client Script",
   "dt": "Purchase Invoice",
   "enabled": 1,
-  "modified": "2024-05-02 15:44:28.747716",
+  "modified": "2024-06-14 11:41:13.830038",
   "module": null,
   "name": "Purchase Invoice Weight Display",
   "script": "function method_call_method(frm, cdt, cdn) {\n    var child = locals[cdt][cdn];\n    var parent = frm.doc;\n    if (child.item_code && child.qty) {\n        frappe.call({\n            method: \"alpha_customization.alpha_customization.blanket_order_address.ItemWeight\",\n            args: {\n                item_code: child.item_code\n            },\n            callback: function(r) {\n                var weight = r.message;\n                var qty = child.qty;\n                child.custom_weight = weight * qty;\n            }\n        });\n    }\n}\n\n\nfrappe.ui.form.on('Purchase Invoice Item', {\n    item_code: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    },\n\n    qty: function(frm, cdt, cdn) {\n        method_call_method(frm, cdt, cdn);\n    }\n});",
@@ -158,10 +158,10 @@
   "doctype": "Client Script",
   "dt": "Foundry Rejection Analaysis",
   "enabled": 1,
-  "modified": "2024-05-13 17:58:02.991958",
+  "modified": "2024-06-08 11:19:42.029329",
   "module": "Quantbit Foundry ERP",
   "name": "Filter - Foundry Rejection Analysis",
-  "script": "var company_field = 'custom_company';\n\nfrappe.ui.form.on('Foundry Rejection Analaysis', {\n    setup: function(frm) {\n    //     frm.set_query(\"core_item_code\", \"core_rejection_details\", function(doc, cdt, cdn) { \n    // \tlet d = locals[cdt][cdn]; \n    // \treturn { \n    // \t    filters: [ \n    // \t                [\"Item\", company_field, '=', frm.doc.company], \n    // \t               // ['Item', 'custom_is_finished_foundry_casting_items', '=',1],\n    // \t                 [\"Item\", 'item_group', 'in', ['Cold Box','COLD BOX - PFPL','SHELL CORE','SHELL - PFPL']]\n    // \t           ] \n    // \t  \t};\n    // \t});\n    \t\n    \tfrm.set_query(\"source_warehouse\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"target_warehouse\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"supervisor_id\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Employee\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"operator_id\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Employee\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"target_warehouse\", \"rejection_details\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    }\n});\n\n\n\n",
+  "script": "var company_field = 'company';\n\nfrappe.ui.form.on('Foundry Rejection Analaysis', {\n    setup: function(frm) {\n    //     frm.set_query(\"core_item_code\", \"core_rejection_details\", function(doc, cdt, cdn) { \n    // \tlet d = locals[cdt][cdn]; \n    // \treturn { \n    // \t    filters: [ \n    // \t                [\"Item\", company_field, '=', frm.doc.company], \n    // \t               // ['Item', 'custom_is_finished_foundry_casting_items', '=',1],\n    // \t                 [\"Item\", 'item_group', 'in', ['Cold Box','COLD BOX - PFPL','SHELL CORE','SHELL - PFPL']]\n    // \t           ] \n    // \t  \t};\n    // \t});\n    \t\n    \tfrm.set_query(\"source_warehouse\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"target_warehouse\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"supervisor_id\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Employee\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"operator_id\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Employee\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    \tfrm.set_query(\"target_warehouse\", \"rejection_details\", function(doc, cdt, cdn) { \n    \tlet d = locals[cdt][cdn]; \n    \treturn { \n    \t    filters: [ \n    \t                [\"Warehouse\", company_field, '=', frm.doc.company], \n    \t           ] \n    \t  \t};\n    \t});\n    \t\n    }\n});\n\n\n\n",
   "view": "Form"
  },
  {
@@ -184,6 +184,17 @@
   "module": null,
   "name": "eWay Bill",
   "script": "// frappe.ui.form.on('Subcontracting', {\n//     refresh: function(frm) {\n//         if (frm.doc.docstatus === 1 && frm.doc.in_or_out == 'OUT') {\n//             frm.add_custom_button(__('eWay Bill'), function() {\n//                 frappe.call({\n//                     method: 'india_compliance.gst_india.utils.e_waybill.generate_e_waybill',\n//                     args: {\n//                         doctype: 'Subcontracting',\n//                         docname: frm.doc.name  // Pass the docname as 'doc' argument\n//                     },\n//                     callback: function(response) {\n//                         console.log(response.message)\n//                     }\n//                 });\n//             });\n//         }\n//     }\n// });",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Order",
+  "enabled": 0,
+  "modified": "2024-06-18 18:05:11.378143",
+  "module": null,
+  "name": "Taxes And Charges",
+  "script": "frappe.ui.form.on('Sales Order', {\n\tafter_save: function(frm) {\n\t    var template = frm.doc.taxes_and_charges;\n\t    frm.set_value('taxes_and_charges', template);\n\t    frm.refresh_field('taxes_and_charges');\n\t    if (template) {\n\t        frappe.call({\n\t            method: \"erpnext.controllers.accounts_controller.get_taxes_and_charges\",\n\t            args: {\n\t                \"master_doctype\": \"Sales Taxes and Charges Template\",\n\t                \"master_name\": template,\n\t                \"company\": frm.doc.company,\n\t                \"tax_category\": frm.doc.tax_category\n\t            },\n\t            callback: function(r) {\n\t                if (r.message) {\n\t                    frm.set_value(\"taxes\", r.message);\n\t                    frm.refresh_field(\"taxes\");\n\t                }\n\t            }\n\t        });\n\t    }\n\t}\n});\n",
   "view": "Form"
  }
 ]

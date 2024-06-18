@@ -218,7 +218,8 @@ fixtures = [
                  'Purchase Invoice Weight Display',
                  'Purchase Order Weight Display',
                  'Purchase Receipt Weight Display',
-                 'Sales Invoice Weight Display', 'Sales Order Weight Display' ,'eWaj Json' , 'eWay Bill')
+                 'Sales Invoice Weight Display', 'Sales Order Weight Display' ,'eWaj Json' , 'eWay Bill',
+                 'Taxes And Charges')
             ],
         ],
     },
@@ -233,7 +234,9 @@ fixtures = [
                 'Cancel Returned Item Status',
                 'Returned Item Status',
                 'Purchase Receipt Time',
-                'Stock Entry Time')
+                'Stock Entry Time',
+                'Sales Invoice Time',
+                'Delete Unchecked Record')
             ],
         ],
     },
